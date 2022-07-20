@@ -9,7 +9,7 @@ const passport = require('passport')
 const connectDB = require('./src/config/db')
 const MongoStore = require('connect-mongo')
 const axios = require('axios')
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 
 
 const app = express()
@@ -58,6 +58,6 @@ app.get("/", function(req, res) {
 //     app.get('/', (req, res) => res.send('Please env variable set to production'))
 // }
 
-app.listen(3000, function() {
-    console.log("Server started on port 3000")
+app.listen(port, function() {
+    console.log(`Server started on port ${port}`)
 })
