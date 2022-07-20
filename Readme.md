@@ -16,6 +16,7 @@ NodeJs Server using Express framework deployed on heroku with MongoDB cloud clus
 2) User Authorisation and protected routes using `jsonwebtokens`
 3) Refresh Tokens last **1d** while Access tokens last **10m**, refresh tokens are used to get access tokens (so as to prevent asking users to continously login to get access tokens). Access tokens are what's required to access protected routes. 
 3) User data encrypted in AES and stored on MongoDB using `mongoose-encryption`
+4) User passwords are hashed and salted using `bcrypt`
 
 ## Diagrams
 Coming Soon
