@@ -48,7 +48,7 @@ app.get("/", function(req, res) {
     res.send("welcome to user service API")
 })
 
-//TODO: to get ready for deployment 
+//TODO: to get ready for deployment  
 // Serve frontend
 // if(process.env.NODE_ENV === 'production') {
 //     app.use(express.static(path.join(__dirname, '../frontend/build')))
