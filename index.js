@@ -49,13 +49,13 @@ app.get("/", function(req, res) {
 
 //TODO: to get ready for deployment 
 // Serve frontend
-if(process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '../frontend/build')))
+// if(process.env.NODE_ENV === 'production') {
+//     app.use(express.static(path.join(__dirname, '../frontend/build')))
 
-    app.get('*', (req, res) => res.sendFile(path.resolve(__dirname, '../frontend', 'build', 'index.html')))
-} else {
-    app.get('/', (req, res) => res.send('Please env variable set to production'))
-}
+//     app.get('*', (req, res) => res.sendFile(path.resolve(__dirname, '../frontend', 'build', 'index.html')))
+// } else {
+//     app.get('/', (req, res) => res.send('Please env variable set to production'))
+// }
 
 app.listen(3000, function() {
     console.log("Server started on port 3000")
