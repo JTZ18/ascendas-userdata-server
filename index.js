@@ -44,7 +44,6 @@ app.use('/api/users', require('./src/routes/userRoutes'))
 app.use('/api/bookings', require('./src/routes/bookingRoutes'))
 
 app.get("/", function(req, res) {
-    res.redirect("https://google.com")
     res.send("welcome to user service API")
 })
 
