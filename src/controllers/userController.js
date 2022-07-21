@@ -18,11 +18,14 @@ const googleOauth = asyncHandler(passport.authenticate("google", { scope: ['prof
 // @ access  Public
 const googleOauthCallback = asyncHandler(async (req, res) => {
     // TODO: Implement google oauth callback
-    // redirect user back to front end page (is this possible?)
-    // generate JWT access and refrssh tokens using req.user data
+    // generate JWT access and refresh tokens using req.user data
+    //asyncHandler(await passport.authenticate('google', { failureRedirect: '/' })) 
     // findOrCreate user in DB via googleId
+    console.log(req.user)
     // send JWT access and refresh tokens and user profile to front end
+    // redirect user back to front end page (is this possible?)
     res.status(200).json({ message: 'Google oauth callback: WIP' })
+    res.redirect('https://journeyside.web.app/')
 })
 
 
@@ -32,11 +35,37 @@ const googleOauthCallback = asyncHandler(async (req, res) => {
 const tokenRefresh = asyncHandler(async (req, res) => {
     // TODO: Implement token refresh feature
     // takes in a JWT refresh token
+    let token
+    token = req.cookies.jwt
+
+    if (!token) {
+        return res.status(401).json({
+            success: false,
+            message: 'You have no refresh token to get an access token' 
+        })
+    }
     // decode the refresh token
+    const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET)
     // check if the refresh token is valid
+    const user = await User.findById(decoded.id).select('-password')
     // if valid, take user ID and generate a new access token
+    if (!user) {
+        return res.status(401).json({
+            success: false,
+            message: 'User does not exist in DB'
+        })
+    }
     // return new access token to front end
-    res.status(200).json({ message: 'tokenRefresh: WIP' })
+    const payload = {
+        username: user.username,
+        id: user._id
+    }
+    const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '10m' })
+    res.status(200).json({ 
+        success: true,
+        message: 'Successfully generated new access token',
+        token: "Bearer " + accessToken
+    })
 })
 
 
