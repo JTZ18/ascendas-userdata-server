@@ -74,6 +74,12 @@ const tokenRefresh = asyncHandler(async (req, res) => {
 // @ route   POST /api/users/register
 // @ access  Public
 const registerUser = asyncHandler(async (req, res) => {
+    if (!req.body.username || !req.body.password) {
+        return res.status(401).json({
+            success: false,
+            message: 'Please fill up username and password'
+        })
+    }
     const userExists = await User.findOne({ username: req.body.username }).select('-password')
     if (userExists) {
         return res.status(400).json({ error: 'User already exists' })
@@ -86,7 +92,7 @@ const registerUser = asyncHandler(async (req, res) => {
     })
 
     if (!newUser) {
-        return res.status(400).send({
+        return res.status(400).json({
             success: false,
             message: "Something went wrong",
             error: err
@@ -101,7 +107,7 @@ const registerUser = asyncHandler(async (req, res) => {
     const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '10m' })
     const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '1d' })
     res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 1000 * 60 * 60 * 24 })
-    return res.status(201).send({
+    return res.status(201).json({
         success: true,
         message: 'User created successfully',
         user_id: newUser._id,
@@ -116,6 +122,12 @@ const registerUser = asyncHandler(async (req, res) => {
 // @ route POST /api/users/login
 // @ access Public
 const loginUser = asyncHandler( async(req, res) => {
+    if (!req.body.username || !req.body.password) {
+        return res.status(401).json({
+            success: false,
+            message: 'Please fill up username and password'
+        })
+    }
     const user = await User.findOne({ username: req.body.username })
     //no  user found
     if(!user) {
