@@ -3,6 +3,7 @@ const path = require('path');
 require('dotenv').config();
 const express = require("express")
 const bodyParser = require("body-parser")
+const cookieParser = require('cookie-parser');
 const mongoose = require("mongoose")
 const session = require('express-session');
 const passport = require('passport')
@@ -10,6 +11,7 @@ const connectDB = require('./src/config/db')
 const MongoStore = require('connect-mongo')
 const axios = require('axios')
 const port = process.env.PORT || 3000;
+  
 
 
 const app = express()
@@ -20,6 +22,7 @@ app.use(bodyParser.urlencoded({
     extended: true
 }))
 app.use(cors({origin: true}))
+app.use(cookieParser());
 
 
 // setup to use passport
