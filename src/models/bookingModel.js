@@ -35,7 +35,14 @@ const bookingSchema = mongoose.Schema({
         'hotelPrice': {type: Number},
         'hotelFreeCancel': {type: Boolean},
         'hotelBreakfast': {type: Boolean},
-        'supplierId': {type: String}   
+        'supplierId': {type: String},
+        'supplierBookingId'  : {type: String},
+        'supplierResponse': {
+            "cost": {type: String},
+            "down_stream_booking_reference": {type: String},
+            "booking_terms_and_conditions": {type: String},
+            "hotel_terms_and_conditions": {type: String}
+        }
     }     
 }, {
     timestamps: true,
