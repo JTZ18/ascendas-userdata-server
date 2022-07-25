@@ -11,8 +11,11 @@ const User = require('../models/userModel')
 // @access  Private
 
 const getBookings = asyncHandler(async (req, res) => {
-    const bookings = await Booking.find( {user: req.user.id} )
-    res.status(200).json(bookings)
+    const user = await User.findById(req.user.id).select('-password')
+    const bookings = await Booking.find( {user: user} )
+    res.status(200).json({
+        bookings
+    })
 })
  
 // @desc    Set booking

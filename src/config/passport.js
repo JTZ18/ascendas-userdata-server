@@ -16,7 +16,7 @@ passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
     //console.log(jwt_payload)
 
     // find user in db
-    User.findOne({ id: jwt_payload.id }, function (err, user) {
+    User.findOne({ _id: jwt_payload.id }, function (err, user) {
         if (err) {
             return done(err, false);
         }
@@ -27,19 +27,35 @@ passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
         }
     })
 }))
-
+console.log(process.env.NODE_ENV)
+console.log(process.env.GOOGLE_CALLBACK_URL_DEV)
 // configuring passport google strategy
-passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "http://localhost:3000/auth/google/secrets" // to change callback url, must change on google cloud project as well
-  },
-  function(accessToken, refreshToken, profile, cb) {
-    User.findOrCreate({ googleId: profile.id }, function (err, user) {
-      return cb(err, user);
-    });
-  }
-));
+if(process.env.NODE_ENV === 'production') {
+    passport.use(new GoogleStrategy({
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: process.env.GOOGLE_CALLBACK_URL_PROD // to change callback url, must change on google cloud project as well
+    },
+    function(accessToken, refreshToken, profile, cb) {
+        //console.log(profile)
+        User.findOrCreate({ googleId: profile.id, username: profile.email }, function (err, user) {
+        return cb(err, user);
+        });
+    }
+    ));
+} else {
+    passport.use(new GoogleStrategy({
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: process.env.GOOGLE_CALLBACK_URL_DEV // to change callback url, must change on google cloud project as well
+    },
+    function(accessToken, refreshToken, profile, email, cb) {
+        User.findOrCreate({ googleId: profile.id, username: email }, function (err, user) {
+        return cb(err, user);
+        });
+    }
+    ));
+}
 
 // passport needs to serialise and deserialise users, mongoose passport plugin helps with that ONLY FOR LOCAL STRATEGY
 passport.use(User.createStrategy())

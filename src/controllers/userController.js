@@ -18,11 +18,14 @@ const googleOauth = asyncHandler(passport.authenticate("google", { scope: ['prof
 // @ access  Public
 const googleOauthCallback = asyncHandler(async (req, res) => {
     // TODO: Implement google oauth callback
-    // redirect user back to front end page (is this possible?)
-    // generate JWT access and refrssh tokens using req.user data
+    // generate JWT access and refresh tokens using req.user data
+    //asyncHandler(await passport.authenticate('google', { failureRedirect: '/' })) 
     // findOrCreate user in DB via googleId
+    console.log(req.user)
     // send JWT access and refresh tokens and user profile to front end
+    // redirect user back to front end page (is this possible?)
     res.status(200).json({ message: 'Google oauth callback: WIP' })
+    res.redirect('https://journeyside.web.app/')
 })
 
 
@@ -32,11 +35,37 @@ const googleOauthCallback = asyncHandler(async (req, res) => {
 const tokenRefresh = asyncHandler(async (req, res) => {
     // TODO: Implement token refresh feature
     // takes in a JWT refresh token
+    let token
+    token = req.cookies.jwt
+
+    if (!token) {
+        return res.status(401).json({
+            success: false,
+            message: 'You have no refresh token to get an access token' 
+        })
+    }
     // decode the refresh token
+    const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET)
     // check if the refresh token is valid
+    const user = await User.findById(decoded.id).select('-password')
     // if valid, take user ID and generate a new access token
+    if (!user) {
+        return res.status(401).json({
+            success: false,
+            message: 'User does not exist in DB'
+        })
+    }
     // return new access token to front end
-    res.status(200).json({ message: 'tokenRefresh: WIP' })
+    const payload = {
+        username: user.username,
+        id: user._id
+    }
+    const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '10m' })
+    res.status(200).json({ 
+        success: true,
+        message: 'Successfully generated new access token',
+        token: "Bearer " + accessToken
+    })
 })
 
 
@@ -45,6 +74,12 @@ const tokenRefresh = asyncHandler(async (req, res) => {
 // @ route   POST /api/users/register
 // @ access  Public
 const registerUser = asyncHandler(async (req, res) => {
+    if (!req.body.username || !req.body.password) {
+        return res.status(401).json({
+            success: false,
+            message: 'Please fill up username and password'
+        })
+    }
     const userExists = await User.findOne({ username: req.body.username }).select('-password')
     if (userExists) {
         return res.status(400).json({ error: 'User already exists' })
@@ -57,7 +92,7 @@ const registerUser = asyncHandler(async (req, res) => {
     })
 
     if (!newUser) {
-        return res.status(400).send({
+        return res.status(400).json({
             success: false,
             message: "Something went wrong",
             error: err
@@ -72,7 +107,7 @@ const registerUser = asyncHandler(async (req, res) => {
     const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '10m' })
     const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '1d' })
     res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 1000 * 60 * 60 * 24 })
-    return res.status(201).send({
+    return res.status(201).json({
         success: true,
         message: 'User created successfully',
         user_id: newUser._id,
@@ -87,6 +122,12 @@ const registerUser = asyncHandler(async (req, res) => {
 // @ route POST /api/users/login
 // @ access Public
 const loginUser = asyncHandler( async(req, res) => {
+    if (!req.body.username || !req.body.password) {
+        return res.status(401).json({
+            success: false,
+            message: 'Please fill up username and password'
+        })
+    }
     const user = await User.findOne({ username: req.body.username })
     //no  user found
     if(!user) {
