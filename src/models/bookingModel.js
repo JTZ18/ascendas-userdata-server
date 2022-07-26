@@ -18,7 +18,7 @@ const bookingSchema = mongoose.Schema({
     cardNum: {type: String},
     address: {type: String},
     bookingCreateDate: {type: Number},
-    bookingKey: {type: String},
+    booking_reference: {type: String},
     cancellation: {type: Boolean},
     location: {type: String},
     locationId: {type: String},
