@@ -10,6 +10,8 @@ const passport = require('passport')
 const connectDB = require('./src/config/db')
 const MongoStore = require('connect-mongo')
 const axios = require('axios')
+const credentials = require('./src/middlewares/credentials')
+const corsOptions = require('./src/config/corsOptions')
 const port = process.env.PORT || 3000;
   
 
@@ -21,7 +23,12 @@ app.use(express.json())
 app.use(bodyParser.urlencoded({
     extended: true
 }))
-app.use(cors({origin: true, credentials: true}))
+// Handle options credentials check - before CORS!
+// and fetch cookies credentials requirement
+app.use(credentials);
+
+// Cross Origin Resource Sharing
+app.use(cors(corsOptions));
 app.use(cookieParser());
 
 
