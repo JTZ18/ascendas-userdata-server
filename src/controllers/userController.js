@@ -145,7 +145,7 @@ const loginUser = asyncHandler( async(req, res) => {
         id: user._id
     }
 
-    const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '10m' })
+    const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '5s' })
     const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '1d' })
     res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 1000 * 60 * 60 * 24, secure: true, sameSite: 'none' })
     // res.header("Set-Cookie", "jwt=" + refreshToken + ";Path=/;HttpOnly;Secure;SameSite=None;Expires=31556926");
