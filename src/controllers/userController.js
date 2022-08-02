@@ -106,7 +106,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '10m' })
     const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '1d' })
-    res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 1000 * 60 * 60 * 24, secure: true, sameSite: 'none'  })
+    res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 1000 * 60 * 60 * 24, secure: true, sameSite: 'none' })
     return res.status(201).json({
         success: true,
         message: 'User created successfully',
